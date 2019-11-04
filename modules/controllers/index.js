@@ -1,5 +1,7 @@
 const adminController = require('./adminController')
+const paperController = require('./paperController');
 
 module.exports = {
-    adminController: adminController
+    adminController: adminController,
+    paperController: paperController,
 }

@@ -17,27 +17,27 @@ const config = {
     version: "/v1",
     databaseSettings: {
         MYSQL_HOST: "127.0.0.1",
-        MYSQL_USER: "root",
-        MYSQL_PASS: "root",
-        MYSQL_DBNAME: "skelton",
-        MYSQL_PORT: 8889
+        MYSQL_USER: "apache_bip_user",
+        MYSQL_PASS: "b1p1$@w3s0m3",
+        MYSQL_DBNAME: "bcn_papers",
+        MYSQL_PORT: 3306
     },
     swaggerSetupConfig: {
         info: {
-            title: "SBC Backend",
+            title: "BIP! Finder API",
             version: "0.0.1",
             contact: {
-                name: "Mukesh Sharma",
-                email: "mukeshsharma1426@gmail.com"
+                name: "diwis",
+                email: "bip@imsi.athenarc.gr"
             }
         },
-        grouping: "tags",
+        grouping: "paper",
         documentationPage: true,
         jsonEditor: true,
         tags: [
             {
-                "name": "Admin",
-                "description": "Admin API's"
+                "name": "Paper",
+                "description": "Get scores for papers"
             }
         ]
     },
