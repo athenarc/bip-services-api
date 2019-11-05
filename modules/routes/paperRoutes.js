@@ -1,16 +1,16 @@
-
 const Joi = require('joi');
 const controller = require('../controllers');
-const Lib = require('../libs/commFunctions')
+const Lib = require('../libs/commFunctions');
+
 const paper = [
     {
         method: 'GET',
-        path: '/paper/{doi}',
+        path: '/paper/scores/{doi}',
         config: {
             handler: async function (request, h) {
-                return controller.paperController.getPaperScores(request.params.doi);
+                return controller.paperController.getPaperScores(request.params.doi.trim());
             },
-            description: 'Ranking scores for an article',
+            description: 'Ranking scores for a single article',
             tags: ['api', 'ranking scores'],
             auth: false,
             validate: {
@@ -21,22 +21,20 @@ const paper = [
         },
     },
     {
-        method: 'POST',
-        path: '/paper/access_token_login',
+        method: 'GET',
+        path: '/paper/scores/batch/{dois}',
         config: {
             handler: async function (request, h) {
-                let accessTokenData = request.auth.artifacts;
-                let accessToken = request.auth.credentials.token
-                return controller.adminController.accessTokenLogin(accessToken, accessTokenData);
+                return controller.paperController.getPaperScoresBatch(request.params.dois.trim().split(','));
             },
-            description: 'Admin Login via access token',
-            notes: 'Admin Login api',
-            tags: ['api', 'Admin'],
-            auth:{
-                strategy: 'skelton'
-            },
+            description: 'Ranking scores for multiple articles',
+            notes: 'Maximum of 50 DOIs per request',
+            tags: ['api', 'ranking scores'],
+            auth: false,
             validate: {
-                headers: Lib.authorizationHeaderObj
+                params: {
+                    dois: Joi.string().required().description("Comma-separated article DOIs"),
+                },
             }
         },
     }

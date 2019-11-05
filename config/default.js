@@ -1,7 +1,8 @@
 const Libs = require('../modules/libs/commFunctions');
 const config = {
     serverSetupConfig: {
-        port: 3000,
+        host: '0.0.0.0',
+        port: 4000,
         routes: {
             cors: {
                 origin: ['*']
@@ -17,9 +18,9 @@ const config = {
     version: "/v1",
     databaseSettings: {
         MYSQL_HOST: "127.0.0.1",
-        MYSQL_USER: "apache_bip_user",
-        MYSQL_PASS: "b1p1$@w3s0m3",
-        MYSQL_DBNAME: "bcn_papers",
+        MYSQL_USER: "user",
+        MYSQL_PASS: "user",
+        MYSQL_DBNAME: "db",
         MYSQL_PORT: 3306
     },
     swaggerSetupConfig: {
@@ -31,12 +32,12 @@ const config = {
                 email: "bip@imsi.athenarc.gr"
             }
         },
-        grouping: "paper",
+        grouping: "paper/scores",
         documentationPage: true,
         jsonEditor: true,
         tags: [
             {
-                "name": "Paper",
+                "name": "Paper Scores",
                 "description": "Get scores for papers"
             }
         ]
