@@ -1,3 +1,4 @@
-let config = require('./default')
+
+let config = require('./default');
         
 module.exports = config;

@@ -1,25 +1,13 @@
-# hapiv17-mysql-skeleton
-Basic boilerplate for Hapi with mysql.
+bip-finder-api
+===============
 
-## Features
-It includes following modules implementation.
-```
-1. Hapi v17
-2. Mysql
-3. Winston logger
-4. Bcrypt
-5. hapi-auth-bearer-token
-6. JWT for access token generation
-7. hapi-swagger
-```
+Quickstart
+----------
 
-## Installation
-```
-Fork it and run npm install
-```
+	npm install
+	npm start
 
-## Future Implementations
-```
- 1. Unit testing module.
- 2. JWT with certificates.
-```
+Deploy with Docker
+-----------------
+	sudo docker build -t diwis/bip-finder-api:latest .
+	sudo docker-compose up -d

@@ -1,5 +1,9 @@
 const MYSQL = require('mysql');
 
+// load env variables
+const dotenv = require('dotenv');
+dotenv.config();
+
 var db_config = {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,

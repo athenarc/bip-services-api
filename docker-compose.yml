@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  pub-finder-service:
+    image: 'diwis/bip-finder-api:latest'
+    restart: always
+    build: .
+    network_mode: 'host'
+    ports:
+    - "4000:4000"
+    environment:
+    - HOST=docker
+    env_file:
+    - '.env'
+    volumes:
+    - /var/log/pub-finder-service:/app/log

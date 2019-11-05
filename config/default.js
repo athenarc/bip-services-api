@@ -1,7 +1,12 @@
 const Libs = require('../modules/libs/commFunctions');
+
+// load env variables
+const dotenv = require('dotenv');
+dotenv.config();
+
 const config = {
     serverSetupConfig: {
-        host: '0.0.0.0',
+        host: process.env.HOSTNAME,
         port: 4000,
         routes: {
             cors: {
