@@ -7,7 +7,7 @@ Quickstart
 	npm install
 	npm start
 
-Deploy with Docker
+Deploy with Forever
 -----------------
-	sudo docker build -t diwis/bip-finder-api:latest .
-	sudo docker-compose up -d
+	npm install forever -g
+	forever start server.js
