@@ -21,13 +21,6 @@ const config = {
         }
     },
     version: "/v1",
-    databaseSettings: {
-        MYSQL_HOST: "127.0.0.1",
-        MYSQL_USER: "user",
-        MYSQL_PASS: "user",
-        MYSQL_DBNAME: "db",
-        MYSQL_PORT: 3306
-    },
     swaggerSetupConfig: {
         info: {
             title: "BIP! Finder API",

@@ -10,9 +10,9 @@ async function getRankingScores(doi) {
         doi,
         pagerank,
         tar_ram,
-        citation_count,
-        abstract_score
-    FROM pmc_paper WHERE doi = ?`;
+        attrank,
+        citation_count
+    FROM impact_scores WHERE doi = ?`;
 
     return dbQuery.executeSQLQuery(sql, [doi]);
 }

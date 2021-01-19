@@ -12,9 +12,11 @@ var db_config = {
     port: process.env.MYSQL_PORT,
     multipleStatements: true
 };
+
 function initializeConnectionPool(db_config){
     var numConnectionsInPool = 0;
-    console.log('CALLING INITIALIZE POOL');
+    console.log('CALLING MYSQL INITIALIZE POOL:');
+    console.log(db_config);
     
     var conn = MYSQL.createPool(db_config);
     conn.on('connection', function (connection) {
