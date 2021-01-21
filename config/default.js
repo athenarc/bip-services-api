@@ -30,6 +30,7 @@ const config = {
                 email: "bip@imsi.athenarc.gr"
             }
         },
+        schemes: ["https"],
         grouping: "paper/scores",
         documentationPage: true,
         jsonEditor: true,
