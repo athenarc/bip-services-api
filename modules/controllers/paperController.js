@@ -11,7 +11,8 @@ async function getRankingScores(doi) {
         pagerank,
         tar_ram,
         attrank,
-        citation_count
+        citation_count,
+        incubation_citation_count
     FROM impact_scores WHERE doi = ?`;
 
     return dbQuery.executeSQLQuery(sql, [doi]);
