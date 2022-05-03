@@ -1,5 +1,7 @@
 const paperController = require('./paperController');
+const scholarController = require('./scholarController');
 
 module.exports = {
-    paperController: paperController,
+    paperController,
+    scholarController,
 }

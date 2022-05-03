@@ -1,6 +1,4 @@
 const Boom = require('boom');
-// const _ = require('lodash');
-
 const Lib = require('../libs/commFunctions');
 const dbQuery = require('../databaseInteractions');
 const api_reference = "Paper_Controller";
@@ -62,7 +60,7 @@ module.exports.getPaperScores = async function(doi) {
     winstonLogger.info({
         api_reference: api_reference,
         event: "/paper/scores/{doi}",
-        body: doi
+        doi: doi
     });
 
     try {      
@@ -93,7 +91,7 @@ module.exports.getPaperScoresBatch = async function(dois) {
     winstonLogger.info({
         api_reference: api_reference,
         event: "/paper/scores/batch/{dois}",
-        body: dois
+        dois: dois
     });
 
     try {   

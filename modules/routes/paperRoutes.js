@@ -43,5 +43,4 @@ const paper = [
     }
 ]
 
-
-module.exports = paper
+module.exports = paper;
