@@ -13,7 +13,7 @@ module.exports.getScholarScores = async function(orcid) {
 
     const bipApiBaseUrl = 'https://bip.imis.athena-innovation.gr';
     let options  = {
-        url: `${bipApiBaseUrl}/scholar/profile-indicators`,
+        url: `${bipApiBaseUrl}/api/profile`,
         qs: {
             orcid
         }, 
