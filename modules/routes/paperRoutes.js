@@ -40,6 +40,33 @@ const paper = [
                 },
             }
         },
+    },
+    {
+        method: 'GET',
+        path: '/paper/search',
+        config: {
+            handler: async function (request, h) {
+                stats.update('/paper/search')
+                return controller.paperController.searchPapers(request.query);
+            },
+            description: 'Search for articles',
+            tags: ['api', 'search', 'ranking scores'],
+            auth: false,
+            validate: {
+                query: {
+                    keywords: Joi.string().required().description("Keywords to search"),
+                    ordering: Joi.string().valid('popularity', 'influence', 'impulse', 'year').default('popularity').description("Sorting field"),
+                    start_year: Joi.number().description("Filter papers published after this year"),
+                    end_year: Joi.number().description("Filter papers published before this year"),
+                    popularity: Joi.string().valid('all', 'substantial', 'exceptional').description("Filter papers based on their popularity class"),
+                    influence: Joi.string().valid('all', 'substantial', 'exceptional').description("Filter papers based on their influence class"),
+                    impulse: Joi.string().valid('all', 'substantial', 'exceptional').description("Filter papers based on their impulse class"),
+                    page: Joi.number().default(1).description("Page number"),
+                    page_size: Joi.number().default(20).description("Page size of the requested page"),
+                    auth_token: Joi.string().required().description("Authntication token"),
+                },
+            }
+        },
     }
 ]
 
