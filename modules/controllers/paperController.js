@@ -143,7 +143,7 @@ module.exports.searchPapers = async function(params) {
     });
 
     const bipApiBaseUrl = 'https://bip.imis.athena-innovation.gr';
-
+    
     let options  = {
         url: `${bipApiBaseUrl}/api/search`,
         qs: params, 
@@ -155,12 +155,6 @@ module.exports.searchPapers = async function(params) {
         let res = await rp(options);
         return res;
     } catch (err) {
-        if (err.error.status == 404) {
-            throw Boom.notFound();
-        } else {
-            winstonLogger.error("Unknown Error for the api ", api_reference, err)
-            const err = Boom.expectationFailed("Expected this to work :(");
-            throw err;  
-        }
+        return err.error;
     }
 }

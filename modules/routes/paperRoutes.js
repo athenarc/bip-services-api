@@ -61,8 +61,8 @@ const paper = [
                     popularity: Joi.string().valid('all', 'substantial', 'exceptional').description("Filter papers based on their popularity class"),
                     influence: Joi.string().valid('all', 'substantial', 'exceptional').description("Filter papers based on their influence class"),
                     impulse: Joi.string().valid('all', 'substantial', 'exceptional').description("Filter papers based on their impulse class"),
-                    page: Joi.number().default(1).description("Page number"),
-                    page_size: Joi.number().default(20).description("Page size of the requested page"),
+                    page: Joi.number().min(1).default(1).description("Page number"),
+                    page_size: Joi.number().min(1).default(20).description("Page size of the requested page"),
                     auth_token: Joi.string().required().description("Authntication token"),
                 },
             }
