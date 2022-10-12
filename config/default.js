@@ -34,12 +34,6 @@ const config = {
         grouping: "paper/scores",
         documentationPage: true,
         jsonEditor: true,
-        tags: [
-            {
-                "name": "Paper Scores",
-                "description": "Get scores for papers"
-            }
-        ]
     },
     constants: {
         passwordLength: 8,
