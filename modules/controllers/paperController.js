@@ -19,46 +19,45 @@ async function getRankingScores(doi) {
 
 async function getImpactClassScores() {
 
-    let res = await dbQuery.executeSQLQuery("SELECT * FROM low_category_scores_view", []);
-    let last_inf_top001 = res[0]['influence_top001'];
-    let last_inf_top1 = res[0]['influence_top1'];
-    let last_pop_top001 = res[0]['popularity_top001'];
-    let last_pop_top1 = res[0]['popularity_top1'];
-    let last_imp_top001 = res[0]['impulse_top001'];
-    let last_imp_top1 = res[0]['impulse_top1'];
+    let [res] = await dbQuery.executeSQLQuery("SELECT * FROM low_category_scores_view", []);
 
-    return {
-        last_inf_top001,
-        last_inf_top1,
-        last_pop_top001,
-        last_pop_top1,
-        last_imp_top001,
-        last_imp_top1,
-    };
+    return res;
 }
 
 async function getImpactClass(impactScores, doc) {
 
-    if( doc['attrank'] >= impactScores['last_pop_top001'])
-        doc['pop_class'] = "A";
-    else if(doc['attrank'] >= impactScores['last_pop_top1'])
-        doc['pop_class'] = "B";
+    if( doc['attrank'] >= impactScores['popularity_top001'])
+        doc['pop_class'] = "C1";
+    else if(doc['attrank'] >= impactScores['popularity_top01'])
+        doc['pop_class'] = "C2";
+    else if(doc['attrank'] >= impactScores['popularity_top1'])
+        doc['pop_class'] = "C3";
+    else if(doc['attrank'] >= impactScores['popularity_top10'])
+        doc['pop_class'] = "C4";
     else
-        doc['pop_class'] = "C";
+        doc['pop_class'] = "C5";
 
-    if(doc['pagerank'] >= impactScores['last_inf_top001'])
-        doc['inf_class'] = "A";
-    else if(doc['pagerank'] >= impactScores['last_inf_top1'])
-        doc['inf_class'] = "B";
+    if(doc['pagerank'] >= impactScores['influence_top001'])
+        doc['inf_class'] = "C1";
+    else if(doc['pagerank'] >= impactScores['influence_top01'])
+        doc['inf_class'] = "C2";
+    else if(doc['pagerank'] >= impactScores['influence_top1'])
+        doc['inf_class'] = "C3";
+    else if(doc['pagerank'] >= impactScores['influence_top10'])
+        doc['inf_class'] = "C4";
     else
-        doc['inf_class'] = "C";
+        doc['inf_class'] = "C5";
 
-    if(doc['3_year_cc'] >= impactScores['last_imp_top001'])
-        doc['imp_class'] = "A";
-    else if(doc['3_year_cc'] >= impactScores['last_imp_top1'])
-        doc['imp_class'] = "B";
+    if(doc['3_year_cc'] >= impactScores['impulse_top001'])
+        doc['imp_class'] = "C1";
+    else if(doc['3_year_cc'] >= impactScores['impulse_top01'])
+        doc['imp_class'] = "C2";
+    else if(doc['3_year_cc'] >= impactScores['impulse_top1'])
+        doc['imp_class'] = "C3";
+    else if(doc['3_year_cc'] >= impactScores['impulse_top10'])
+        doc['imp_class'] = "C4";
     else
-        doc['imp_class'] = "C";
+        doc['imp_class'] = "C5";
 
     return doc;
 }
