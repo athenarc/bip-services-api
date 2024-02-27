@@ -28,7 +28,7 @@ const paper = [
         config: {
             handler: async function (request, h) {
                 stats.update('/paper/scores/batch/')
-                return controller.paperController.getPaperScoresBatch(request.params.dois.trim().split(','));
+                return controller.paperController.getPaperScoresBatch(request.params.dois.trim().split(',').slice(0,50));
             },
             description: 'Ranking scores for multiple articles',
             notes: 'Maximum of 50 DOIs per request',

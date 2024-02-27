@@ -3,16 +3,17 @@ const Lib = require('../libs/commFunctions');
 const dbQuery = require('../databaseInteractions');
 const api_reference = "Paper_Controller";
 const rp = require('request-promise');
+const _ = require('lodash');
 
 async function getRankingScores(doi) {
     let sql = `SELECT
         doi,
-	attrank,
-	tar_ram,
-	pagerank,
-	3y_cc as 3_year_cc,
-	citation_count as cc
-    FROM pmc_paper WHERE doi = ?`;
+        attrank,
+        tar_ram,
+        pagerank,
+        3y_cc as 3_year_cc,
+        citation_count as cc
+        FROM pmc_paper WHERE doi IN ( ? )`;
     return dbQuery.executeSQLQuery(sql, [doi]);
 }
 
@@ -31,8 +32,8 @@ async function getImpactClassScores() {
         last_inf_top1,
         last_pop_top001,
         last_pop_top1,
-	last_imp_top001,
-	last_imp_top1,
+        last_imp_top001,
+        last_imp_top1,
     };
 }
 
@@ -100,28 +101,29 @@ module.exports.getPaperScoresBatch = async function(dois) {
     });
 
     try {
-        res = [];
 
         let impactScores = await getImpactClassScores();
 
-        for (let i in dois.slice(0, 50)) {
-            let doi = dois[i];
-            let doc;
-            let docs = await getRankingScores(doi);
+        // get docs from the DB
+        let docs = await getRankingScores(dois);
 
-            if(!docs.length){
-                doc = {
-                    doi: doi,
-                    msg: "Not Found"
-                };
-            } else {
-                doc = await getImpactClass(impactScores, docs[0]);
-            }
-
-            res.push(doc);
+        // get the impact class of each found document
+        for (let doc of docs) {
+            doc = await getImpactClass(impactScores, doc);  
         }
+        
+        // extract DOIs found
+        let doisFound = _.map(docs, 'doi');
+    
+        // for DOIs not found in the DB, prepare the appropriate document to append in the response
+        let missingDocs = _.difference(dois, doisFound).map( (missingDoi) => {
+            return {
+                doi: missingDoi, 
+                msg: "Not Found"
+            };
+        });
 
-        return res;
+        return docs.concat(missingDocs);
 
     } catch (error) {
         if (error.isBoom) {
