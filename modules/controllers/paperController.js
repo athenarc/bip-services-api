@@ -82,12 +82,11 @@ module.exports.getPaperScores = async function(doi) {
 
     } catch (error) {
         if (error.isBoom) {
-            const err = error.output.payload;
-            return err
+            throw error;
         } else {
             winstonLogger.error("Unknown Error for the api ", api_reference, error)
             const err = Boom.expectationFailed("Expected this to work :(");
-            throw err
+            throw err;
         }
     }
 }
@@ -126,12 +125,11 @@ module.exports.getPaperScoresBatch = async function(dois) {
 
     } catch (error) {
         if (error.isBoom) {
-            const err = error.output.payload;
-            return err
+            throw error;
         } else {
             winstonLogger.error("Unknown Error for the api ", api_reference, error)
             const err = Boom.expectationFailed("Expected this to work :(");
-            throw err
+            throw err;
         }
     }
 }
