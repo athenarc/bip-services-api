@@ -23,11 +23,11 @@ const config = {
     version: "/v1",
     swaggerSetupConfig: {
         info: {
-            title: "BIP! Finder API",
-            version: "0.0.1",
+            title: "BIP! API",
+            version: "1.0.0",
             contact: {
-                name: "diwis",
-                email: "bip@imsi.athenarc.gr"
+                name: "the Sknow Lab",
+                email: "bip@athenarc.gr"
             }
         },
         schemes: ["https"],
