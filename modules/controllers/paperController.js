@@ -9,11 +9,12 @@ async function getRankingScores(doi) {
     let sql = `SELECT
         doi,
         attrank,
-        tar_ram,
         pagerank,
         3y_cc as 3_year_cc,
         citation_count as cc
-        FROM pmc_paper WHERE doi IN ( ? )`;
+        FROM pmc_paper
+	INNER JOIN pmc_paper_pids ON pmc_paper.internal_id = pmc_paper_pids.paper_id
+	WHERE doi IN ( ? )`;
     return dbQuery.executeSQLQuery(sql, [doi]);
 }
 
