@@ -59,6 +59,17 @@ async function getImpactClass(impactScores, doc) {
     else
         doc['imp_class'] = "C5";
 
+    if(doc['cc'] >= impactScores['cc_top001'])
+        doc['cc_class'] = "C1";
+    else if(doc['cc'] >= impactScores['cc_top01'])
+        doc['cc_class'] = "C2";
+    else if(doc['cc'] >= impactScores['cc_top1'])
+        doc['cc_class'] = "C3";
+    else if(doc['cc'] >= impactScores['cc_top10'])
+        doc['cc_class'] = "C4";
+    else
+        doc['cc_class'] = "C5";
+
     return doc;
 }
 
