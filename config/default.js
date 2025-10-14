@@ -1,4 +1,5 @@
 const Libs = require('../modules/libs/commFunctions');
+const Joi = require('joi');
 
 // load env variables
 const dotenv = require('dotenv');
@@ -13,6 +14,7 @@ const config = {
                 origin: ['*']
             },
             validate: {
+                validator: Joi,
                 failAction: async (request, h, err) => {
                     const error = Libs.failActionFunction(err)
                     throw error;
@@ -30,10 +32,7 @@ const config = {
                 email: "bip@athenarc.gr"
             }
         },
-        schemes: ["https"],
-        grouping: "paper/scores",
-        documentationPage: true,
-        jsonEditor: true,
+        schemes: ["http", "https"],
     },
     constants: {
         passwordLength: 8,

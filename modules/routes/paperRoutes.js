@@ -12,8 +12,8 @@ const paper = [
                 stats.update('/paper/scores/')
                 return controller.paperController.getPaperScores(request.params.doi.trim());
             },
-            description: 'Ranking scores for a single article',
-            tags: ['api', 'ranking scores'],
+            description: 'Citation-based impact indicators for a single article',
+            tags: ['api', 'impact indicators'],
             auth: false,
             validate: {
                 params: {
@@ -28,11 +28,13 @@ const paper = [
         config: {
             handler: async function (request, h) {
                 stats.update('/paper/scores/batch/')
-                return controller.paperController.getPaperScoresBatch(request.params.dois.trim().split(',').slice(0,50));
+                return controller.paperController.getPaperScoresBatch(
+                    request.params.dois.trim().split(',').map(doi => doi.trim()).slice(0,50)
+                );
             },
-            description: 'Ranking scores for multiple articles',
+            description: 'Citation-based impact indicators for multiple articles',
             notes: 'Maximum of 50 DOIs per request',
-            tags: ['api', 'ranking scores'],
+            tags: ['api', 'impact indicators'],
             auth: false,
             validate: {
                 params: {
@@ -49,8 +51,9 @@ const paper = [
                 stats.update('/paper/search')
                 return controller.paperController.searchPapers(request.query);
             },
-            description: 'Search for articles',
-            tags: ['api', 'search', 'ranking scores'],
+            description: 'Search for articles in the BIP! database',
+            notes: 'This endpoint requires a valid authentication token',
+            tags: ['api', 'search', 'impact indicators'],
             auth: false,
             validate: {
                 query: {

@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
-const Boom = require('boom');
+const Boom = require('@hapi/boom');
 const Joi = require('joi')
 
 

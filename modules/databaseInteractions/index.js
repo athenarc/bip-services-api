@@ -1,7 +1,5 @@
-const Q = require('q');
-
 module.exports.executeTransactionQuery = function(conn, sql, params) {
-    return Q.Promise(function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
         const query = conn.query(sql, params, (err, result) => {
             if (err) {
                 return reject(err)
@@ -14,7 +12,7 @@ module.exports.executeTransactionQuery = function(conn, sql, params) {
 
 
 module.exports.executeSQLQuery = function(sql, params) {
-    return Q.Promise(function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
         const query = connection.query(sql, params, (err, result) => {
             if (err) {
                 return reject(err)

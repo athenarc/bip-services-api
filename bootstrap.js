@@ -1,4 +1,4 @@
-const MYSQL = require('mysql');
+const MYSQL = require('mysql2');
 
 // load env variables
 const dotenv = require('dotenv');
@@ -14,16 +14,11 @@ var db_config = {
 };
 
 function initializeConnectionPool(db_config){
-    var numConnectionsInPool = 0;
-    console.log('CALLING MYSQL INITIALIZE POOL:');
+
+    console.log('DB CONFIG:');
     console.log(db_config);
     
-    var conn = MYSQL.createPool(db_config);
-    conn.on('connection', function (connection) {
-        numConnectionsInPool++;
-        console.log('NUMBER OF CONNECTION IN POOL : ', numConnectionsInPool);
-    });
-    return conn;
+    return MYSQL.createPool(db_config);
 }
 
 

@@ -1,8 +1,8 @@
-const Boom = require('boom');
+const Boom = require('@hapi/boom');
 const Lib = require('../libs/commFunctions');
 const dbQuery = require('../databaseInteractions');
 const api_reference = "Paper_Controller";
-const rp = require('request-promise');
+const axios = require('axios');
 const _ = require('lodash');
 
 async function getRankingScores(doi) {
@@ -96,7 +96,7 @@ module.exports.getPaperScores = async function(doi) {
         if (error.isBoom) {
             throw error;
         } else {
-            winstonLogger.error("Unknown Error for the api ", api_reference, error)
+            winstonLogger.error(`Unknown Error for the api ${api_reference}: ${error.message || error}`)
             const err = Boom.expectationFailed("Expected this to work :(");
             throw err;
         }
@@ -139,7 +139,7 @@ module.exports.getPaperScoresBatch = async function(dois) {
         if (error.isBoom) {
             throw error;
         } else {
-            winstonLogger.error("Unknown Error for the api ", api_reference, error)
+            winstonLogger.error(`Unknown Error for the api ${api_reference}: ${error.message || error}`)
             const err = Boom.expectationFailed("Expected this to work :(");
             throw err;
         }
@@ -155,17 +155,13 @@ module.exports.searchPapers = async function(params) {
 
     const bipApiBaseUrl = 'https://bip.imis.athena-innovation.gr';
     
-    let options  = {
-        url: `${bipApiBaseUrl}/api/search`,
-        qs: params, 
-        rejectUnauthorized: false,
-        json: true,
-    };
-
     try {
-        let res = await rp(options);
-        return res;
+        let res = await axios.get(`${bipApiBaseUrl}/api/search`, {
+            params: params,
+            httpsAgent: new (require('https').Agent)({ rejectUnauthorized: false })
+        });
+        return res.data;
     } catch (err) {
-        return err.error;
+        return err.response?.data || err.message;
     }
 }
