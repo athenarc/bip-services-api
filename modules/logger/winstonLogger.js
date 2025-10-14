@@ -17,9 +17,17 @@ if (process.env.NODE_ENV !== 'live') {
   // colorize the output to the console
   // winston console only if not production
   transports.push(
-    new (winston.transports.Console)({
-      timestamp: tsFormat,
-      colorize: true,
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.timestamp({ format: 'HH:mm:ss' }),
+        winston.format.printf(({ timestamp, level, message, ...meta }) => {
+          // Handle objects properly
+          const msg = typeof message === 'object' ? JSON.stringify(message) : message;
+          const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : '';
+          return `${timestamp} ${level}: ${msg} ${metaStr}`;
+        })
+      ),
       level: 'info', // level of log
     })
   );
@@ -29,9 +37,12 @@ if (process.env.NODE_ENV !== 'live') {
 if(process.env.NODE_ENV === 'live') {
   // generates the log files
   transports.push(
-    new (WinstonRotateFile)({
+    new WinstonRotateFile({
       filename: `${logDir}/-results.log`, // filename to be created
-      timestamp: tsFormat,
+      format: winston.format.combine(
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        winston.format.json()
+      ),
       datePattern: 'yyyy-MM-dd',
       prepend: true, // prepends date to name of file
       level: 'info', // level of log
@@ -39,6 +50,6 @@ if(process.env.NODE_ENV === 'live') {
   );
 }
 // winston logger to generate logs
-global.winstonLogger = new (winston.Logger)({
+global.winstonLogger = winston.createLogger({
   transports,
 });

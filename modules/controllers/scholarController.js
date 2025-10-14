@@ -1,6 +1,5 @@
-const { serverUnavailable } = require('boom');
-const Boom = require('boom');
-const rp = require('request-promise');
+const Boom = require('@hapi/boom');
+const axios = require('axios');
 const api_reference = "Scholar_Controller";
 var httpProxy = require('http-proxy');
 
@@ -12,25 +11,19 @@ module.exports.getScholarScores = async function(orcid) {
     });
 
     const bipApiBaseUrl = 'https://bip.imis.athena-innovation.gr';
-    let options  = {
-        url: `${bipApiBaseUrl}/api/profile`,
-        qs: {
-            orcid
-        }, 
-        rejectUnauthorized: false,
-        json: true,
-    };
 
     try {
-        let res = await rp(options);
-        return res;
+        let res = await axios.get(`${bipApiBaseUrl}/api/profile`, {
+            params: { orcid },
+            httpsAgent: new (require('https').Agent)({ rejectUnauthorized: false })
+        });
+        return res.data;
     } catch (err) {
-        if (err.error.status == 404) {
+        if (err.response?.status == 404) {
             throw Boom.notFound();
         } else {
-            winstonLogger.error("Unknown Error for the api ", api_reference, err)
-            const err = Boom.expectationFailed("Expected this to work :(");
-            throw err;  
+            winstonLogger.error(`Unknown Error for the api ${api_reference}: ${err.message || err}`)
+            throw Boom.expectationFailed("Expected this to work :(");
         }
     }
 }

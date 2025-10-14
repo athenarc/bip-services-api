@@ -8,9 +8,9 @@
  */
 require('./modules/logger/winstonLogger.js');
 
-const Hapi = require('hapi');
-const Inert = require('inert');
-const Vision = require('vision');
+const Hapi = require('@hapi/hapi');
+const Inert = require('@hapi/inert');
+const Vision = require('@hapi/vision');
 const HapiSwagger = require('hapi-swagger');
 const AuthBearer = require('hapi-auth-bearer-token');
 const Libs = require('./modules/libs/commFunctions')
@@ -32,7 +32,7 @@ async function serverSetup() {
          * server host and port configuration for server setup 
          **/
         const serverConfig = Config.serverSetupConfig
-        const server = new Hapi.Server(serverConfig);
+        const server = Hapi.server(serverConfig);
         
         await server.register(AuthBearer)
 
@@ -75,9 +75,9 @@ async function serverSetup() {
          **** server started ****
          ************************/
         await server.start();
-        winstonLogger.info('Server is running at -------------------------------> ', server.info.uri);
+        winstonLogger.info(`Server is running at -------------------------------> ${server.info.uri}`);
     } catch (error) {
-        winstonLogger.error('Unable to start server -----------------------------> ', error);
+        winstonLogger.error(`Unable to start server -----------------------------> ${error.message || error}`);
         /**
          * Shutdown Process if error
          */
@@ -86,7 +86,7 @@ async function serverSetup() {
 }
 
 process.on('uncaughtException', (err) => {
-    winstonLogger.error('uncaught Exception Occurred ------------> ', err.stack);
+    winstonLogger.error(`uncaught Exception Occurred ------------> ${err.stack || err.message}`);
 });
   
 
