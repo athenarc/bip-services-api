@@ -35,13 +35,8 @@ const config = {
         schemes: ["http", "https"],
     },
     constants: {
-        passwordLength: 8,
         bcryptSaltRounds: 10,
-        jwtKey: "@E#223D$FdafEW$342sa22sds",
-        deviceType: {
-            ANDROID: "Android",
-            IOS: "Ios"
-        }
+        jwtKey: process.env.JWT_SECRET
     }
 }
 
