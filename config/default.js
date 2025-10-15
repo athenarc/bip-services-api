@@ -25,8 +25,8 @@ const config = {
     version: "/v1",
     swaggerSetupConfig: {
         info: {
-            title: "BIP! API",
-            version: "1.0.0",
+            title: "BIP! Services API",
+            version: "1.1.0",
             contact: {
                 name: "the Sknow Lab",
                 email: "bip@athenarc.gr"
