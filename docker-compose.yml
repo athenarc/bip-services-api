@@ -1,16 +1,14 @@
-version: '3'
+version: '3.8'
+
+name: bip-services-api
 
 services:
-  pub-finder-service:
-    image: 'diwis/bip-finder-api:latest'
-    restart: always
+  # BIP! Finder API
+  bip-api:
     build: .
-    network_mode: 'host'
-    ports:
-    - "4000:4000"
-    environment:
-    - HOST=docker
     env_file:
-    - '.env'
+      - .env
     volumes:
-    - /var/log/pub-finder-service:/app/log
+      - ./log:/app/log
+    network_mode: host
+    restart: unless-stopped

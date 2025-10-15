@@ -1,18 +1,28 @@
-FROM risingstack/alpine:3.4-v8.9.4-4.8.0
+# Use official Node.js runtime as base image
+FROM node:24-alpine
 
-MAINTAINER serafeim
+# Set working directory
+WORKDIR /app
 
-RUN apk update
+# Copy package.json and package-lock.json (if available)
+COPY package*.json ./
 
-ENV NODE_ENV production
-ENV DB_ENV live
-ENV PORT 3000
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
 
-EXPOSE 3000
-
-COPY package.json package.json
-RUN npm install --only=production
-
+# Copy application code
 COPY . .
 
-CMD npm start
+# Create non-root user and set ownership in one step
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 4000
+
+# Start the application
+CMD ["npm", "start"]

@@ -84,9 +84,146 @@ npm start
 
 The server will start on port **4000** (configurable via environment).
 
+### Docker Development
+
+#### Prerequisites
+- Docker and Docker Compose installed
+- Existing MariaDB/MySQL instance running on port 3306
+- `.env` file configured (see [Configuration](#configuration))
+
+#### Quick Start with Docker
+
+**Using the deployment script (Recommended):**
+```bash
+# Make script executable (first time only)
+chmod +x deployment.sh
+
+# Start the application
+./deployment.sh start
+
+# View logs
+./deployment.sh logs
+
+# Stop the application
+./deployment.sh stop
+
+# Check status
+./deployment.sh status
+```
+
+**Manual Docker Compose commands:**
+```bash
+# Build and run the application
+docker compose up --build
+
+# Run in background
+docker compose up -d --build
+
+# View logs
+docker compose logs -f bip-api
+
+# Stop the application
+docker compose down
+```
+
+#### Docker Configuration
+
+The application uses:
+- **Node.js 24** Alpine image for consistency with local development
+- **Host networking** to connect to your existing MariaDB container
+- **Environment variables** loaded from `.env` file
+- **Volume mapping** for log files (`./log:/app/log`)
+
+#### Connecting to Existing Database
+
+The Docker setup assumes you have a MariaDB container running (like `mariadb11`). Update your `.env` file:
+
+```bash
+# For Docker, use host.docker.internal to connect to host services
+MYSQL_HOST=host.docker.internal
+# ... other variables remain the same
+```
+
+#### Docker Development Commands
+
+**Using the deployment script:**
+```bash
+# Start services
+./deployment.sh start
+
+# Stop services
+./deployment.sh stop
+
+# View live logs
+./deployment.sh logs
+
+# Restart application
+./deployment.sh restart
+
+# Check service status
+./deployment.sh status
+
+# Build without starting
+./deployment.sh build
+
+# Show help
+./deployment.sh
+```
+
+**Manual Docker Compose commands:**
+```bash
+# Build only
+docker compose build
+
+# Run with live logs
+docker compose up
+
+# Restart application only
+docker compose restart bip-api
+
+# View application logs
+docker compose logs -f bip-api
+
+# Execute commands inside container
+docker compose exec bip-api sh
+
+# Clean up (removes containers and volumes)
+docker compose down -v
+```
+
 ### Production Deployment
 
-#### Using PM2 (Recommended)
+#### Using Docker (Recommended for Production)
+
+For production deployment with Docker:
+
+```bash
+# Build production image
+docker build -t bip-services-api .
+
+# Run with production environment
+docker run -d \
+  --name bip-services-api \
+  --restart unless-stopped \
+  -p 4000:4000 \
+  --env-file .env \
+  -v /path/to/logs:/app/log \
+  bip-finder-api
+```
+
+Create `.env.production` with production settings:
+```bash
+NODE_ENV=live
+MYSQL_HOST=your-production-db-host
+MYSQL_USER=your-production-user
+MYSQL_PASS=your-production-password
+MYSQL_DBNAME=bcn_papers
+MYSQL_PORT=3306
+HOSTNAME=0.0.0.0
+JWT_SECRET=your-production-jwt-secret
+```
+
+#### Using PM2 (Alternative)
 
 ```bash
 # Install PM2 globally
@@ -169,6 +306,7 @@ bip-finder-api/
 - **Hapi.js v20**: Web framework
 - **Joi v17**: Request validation
 - **MySQL2 v3**: Database driver with connection pooling
+- **Node.js v24**: Runtime environment
 
 ### Plugins & Middleware
 - **hapi-swagger v14**: API documentation
@@ -183,6 +321,12 @@ bip-finder-api/
 - **winston**: Logging framework
 - **lodash**: Utility functions
 
+### Development Tools
+- **nodemon**: Development auto-restart
+- **Docker**: Containerization
+- **Docker Compose**: Multi-container orchestration
+- **deployment.sh**: Automated deployment script
+
 ### Recent Upgrades
 
 This project was recently upgraded to modern dependencies. See `UPGRADE_SUMMARY.md` for details:
@@ -191,6 +335,9 @@ This project was recently upgraded to modern dependencies. See `UPGRADE_SUMMARY.
 - request-promise → axios
 - Q promises → native Promises
 - Winston v2 → v3
+- Added Docker support
+- Added nodemon for development
+- Added automated deployment script
 
 ## Contributing
 
