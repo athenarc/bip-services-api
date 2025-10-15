@@ -1,6 +1,6 @@
-# BIP! Finder API
+# BIP! Services API
 
-RESTful API for accessing citation-based impact indicators from the BIP! (Beyond Impact Paper) database. This service provides ranking scores and bibliometric indicators for scientific publications.
+RESTful API for accessing citation-based impact indicators the BIP! Services. This service provides ranking scores and bibliometric indicators for scientific publications.
 
 ## Table of Contents
 
