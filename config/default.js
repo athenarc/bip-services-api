@@ -38,7 +38,7 @@ const config = {
         grouping: 'tags',
         tags: [
             { name: 'Citation-based impact indicators', description: 'Main category for citation-based impact indicators' },
-            { name: 'RA-SKG', description: 'API endpoints compliant with the [RA-SKG extension](https://skg-if.github.io/ext-ra-skg/) of the [SKG Interoperability Framework (SKG-IF)](https://skg-if.github.io/)' },
+            { name: 'DB - RA-SKG', description: 'BIP! DB API endpoints compliant with the [RA-SKG extension](https://skg-if.github.io/ext-ra-skg/) of the [SKG Interoperability Framework (SKG-IF)](https://skg-if.github.io/)' },
         ]
     },
     constants: {

@@ -11,12 +11,16 @@ module.exports = [
             handler: async function (request, h) {
                 // Extract id parameter from the local_identifier URL
                 const url = new URL(request.params.local_identifier.trim());
-                const id = url.searchParams.get('id');
+                let id = url.searchParams.get('id');
 
                 if (!id) {
-                    throw Boom.badRequest('Missing id parameter in local_identifier');
+                    id = request.params.local_identifier.trim();
                 }
 
+                // patch openaire_id to be compliant with the db values
+                // TODO: remove this once the db values are updated
+                id = `50|${id}`;
+                
                 return productController.getProduct(id);
             },
             description: 'Get a single product',
@@ -70,35 +74,5 @@ module.exports = [
             //     },
             // }
         },
-    },
-    // {
-    //     method: 'GET',
-    //     path: '/paper/search',
-    //     config: {
-    //         handler: async function (request, h) {
-    //             stats.update('/paper/search')
-    //             return controller.paperController.searchPapers(request.query);
-    //         },
-    //         description: 'Search for articles in the BIP! database',
-    //         notes: 'This endpoint requires a valid authentication token',
-    //         tags: ['api', 'impact indicators'],
-    //         auth: false,
-    //         validate: {
-    //             query: {
-    //                 keywords: Joi.string().required().description("Keywords to search"),
-    //                 rcsb_id: Joi.string().description("RCSB Identifier"),
-    //                 ordering: Joi.string().valid('popularity', 'influence', 'citation_count', 'impulse', 'year').default('popularity').description("Sorting field"),
-    //                 start_year: Joi.number().description("Filter papers published after this year"),
-    //                 end_year: Joi.number().description("Filter papers published before this year"),
-    //                 popularity: Joi.string().valid('all', 'top001', 'top01', 'top1', 'top10').description("Filter papers based on their popularity class"),
-    //                 influence: Joi.string().valid('all', 'top001', 'top01', 'top1', 'top10').description("Filter papers based on their influence class"),
-    //                 cc: Joi.string().valid('all', 'top001', 'top01', 'top1', 'top10').description("Filter papers based on their citation count class"),                    
-    //                 impulse: Joi.string().valid('all', 'top001', 'top01', 'top1', 'top10').description("Filter papers based on their impulse class"),
-    //                 page: Joi.number().min(1).default(1).description("Page number"),
-    //                 page_size: Joi.number().min(1).default(20).description("Page size of the requested page"),
-    //                 auth_token: Joi.string().required().description("Authntication token"),
-    //             },
-    //         }
-    //     },
-    // }
+    }
 ];

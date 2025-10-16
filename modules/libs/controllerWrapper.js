@@ -43,6 +43,9 @@ function withLogging(api_reference, event, fn) {
                 duration: Date.now() - startTime
             });
             
+            console.error(err);
+
+            // Re-throw the error so Hapi can handle it properly
             throw err;
         }
     };

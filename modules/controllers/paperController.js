@@ -10,23 +10,26 @@ const config = require('../../config/default');
 // Define the controller functions without logging
 const controller = {
     getPaperScores: async function(doi) {
-        let docs = await paperModel.getRankingScores(doi);
+        let docs = await paperModel.getScores(doi, 'doi');
         if(!docs.length){
             throw Boom.notFound();
         }
 
         let doc = await paperModel.enrichWithImpactClasses(docs[0]);
 
-        return doc;
+        return paperModel.transformToOriginalFormat(doc);
     },
 
     getPaperScoresBatch: async function(dois) {
-        
+
         // get docs from the DB
-        let docs = await paperModel.getRankingScores(dois);
+        let docs = await paperModel.getScores(dois, 'doi');
         
         // enrich each document with the impact classes
         docs = await Promise.all(docs.map(doc => paperModel.enrichWithImpactClasses(doc)));
+        
+        // transform to original format for API compatibility
+        docs = docs.map(doc => paperModel.transformToOriginalFormat(doc));
 
         // extract DOIs found
         let doisFound = _.map(docs, 'doi');
