@@ -26,17 +26,25 @@ const config = {
     swaggerSetupConfig: {
         info: {
             title: "BIP! Services API",
-            version: "1.1.0",
+            version: "2.0.0",
+            description: "RESTful API for accessing citation-based impact indicators from the BIP! Services.",
             contact: {
                 name: "the Sknow Lab",
                 email: "bip@athenarc.gr"
             }
         },
-        schemes: ["http", "https"],
+        host: process.env.SWAGGER_HOST,
+        schemes: (process.env.SWAGGER_SCHEMES).split(',').map(s => s.trim()),
+        grouping: 'tags',
+        tags: [
+            { name: 'Citation-based impact indicators', description: 'Main category for citation-based impact indicators' },
+            { name: 'RA-SKG', description: 'API endpoints compliant with the [RA-SKG extension](https://skg-if.github.io/ext-ra-skg/) of the [SKG Interoperability Framework (SKG-IF)](https://skg-if.github.io/)' },
+        ]
     },
     constants: {
         bcryptSaltRounds: 10,
-        jwtKey: process.env.JWT_SECRET
+        jwtKey: process.env.JWT_SECRET,
+        bipApiBaseUrl: process.env.BIP_API_BASE_URL
     }
 }
 

@@ -50,6 +50,9 @@ if(process.env.NODE_ENV === 'live') {
   );
 }
 // winston logger to generate logs
-global.winstonLogger = winston.createLogger({
+const winstonLogger = winston.createLogger({
   transports,
 });
+
+// Export the logger instance
+module.exports = winstonLogger;
