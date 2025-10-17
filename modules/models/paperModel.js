@@ -1,4 +1,5 @@
 const dbQuery = require('../databaseInteractions');
+const { getDbColumnForMeasureClass } = require('../config/indicatorMapping');
 
 /**
  * Get ranking scores for papers by DOI or ID
@@ -49,6 +50,112 @@ async function getScores(identifiers, identifierType = 'doi') {
     }
     
     return dbQuery.executeSQLQuery(sql, [identifiers]);
+}
+
+/**
+ * Get ranking scores for papers with filtering and pagination
+ * @param {Object} filters - Filter parameters including pagination
+ * @returns {Promise<Array>} Array of paper ranking data with count
+ */
+async function getScoresWithFilters(filters) {
+
+    console.log(filters);
+    
+    let sql = `SELECT
+        p.openaire_id,
+        CASE 
+            WHEN p.type = 0 THEN 'literature'
+            WHEN p.type = 1 THEN 'research data'
+            WHEN p.type = 2 THEN 'research software'
+            WHEN p.type = 3 THEN 'other'
+            ELSE 'literature'
+        END as product_type,
+        p.attrank as popularity,
+        p.pagerank as influence,
+        p.3y_cc as impulse,
+        p.citation_count as citation_count,
+        GROUP_CONCAT(
+            CASE 
+                WHEN pid.doi IS NOT NULL THEN CONCAT('{"value":"', pid.doi, '","scheme":"doi"}')
+                ELSE NULL
+            END
+            SEPARATOR '|||'
+        ) as pids
+        FROM pmc_paper p
+    LEFT JOIN pmc_paper_pids pid ON p.internal_id = pid.paper_id
+    WHERE 1=1`;
+    
+    const params = [];
+    
+    // TODO: create an index?
+    // Product type filter
+    if (filters.product_type) {
+        let typeValue;
+        switch (filters.product_type) {
+            case 'literature': typeValue = 0; break;
+            case 'research data': typeValue = 1; break;
+            case 'research software': typeValue = 2; break;
+            case 'other': typeValue = 3; break;
+        }
+        if (typeValue !== undefined) {
+            sql += ` AND p.type = ?`;
+            params.push(typeValue);
+        }
+    }
+    
+    // Identifier filters
+    if (filters['identifiers.id']) {
+        const identifiers = filters['identifiers.id'].split(',').map(id => id.trim()).filter(id => id);
+        if (identifiers.length === 1) {
+            sql += ` AND pid.doi = ?`;
+            params.push(identifiers[0]);
+        } else if (identifiers.length > 1) {
+            const placeholders = identifiers.map(() => '?').join(',');
+            sql += ` AND pid.doi IN (${placeholders})`;
+            params.push(...identifiers);
+        }
+    }
+    
+    if (filters['identifiers.scheme']) {
+        sql += ` AND pid.pid_type = ?`;
+        params.push(filters['identifiers.scheme']);
+    }
+    
+    // Value range filters - filter specific indicator based on measure class
+    if (filters['cf.min.ra_metrics.ra_metric.ra_value'] || filters['cf.max.ra_metrics.ra_metric.ra_value']) {
+        const measureClass = filters['ra_metrics.ra_metric.ra_measure.class'];
+        
+        if (!measureClass) {
+            throw new Error('ra_metrics.ra_metric.ra_measure.class is required when using value filters');
+        }
+        
+        // Get database column for the measure class
+        const metricColumn = getDbColumnForMeasureClass(measureClass);
+        
+        // Apply min value filter
+        if (filters['cf.min.ra_metrics.ra_metric.ra_value']) {
+            sql += ` AND ${metricColumn} >= ?`;
+            params.push(filters['cf.min.ra_metrics.ra_metric.ra_value']);
+        }
+        
+        // Apply max value filter
+        if (filters['cf.max.ra_metrics.ra_metric.ra_value']) {
+            sql += ` AND ${metricColumn} <= ?`;
+            params.push(filters['cf.max.ra_metrics.ra_metric.ra_value']);
+        }
+    }
+        
+    // Group by and pagination
+    sql += ` GROUP BY p.internal_id`;
+    
+    // Add pagination
+    const offset = (filters.page - 1) * filters.page_size;
+    sql += ` LIMIT ? OFFSET ?`;
+    params.push(filters.page_size, offset);
+
+    console.log(sql, params);
+    
+    return dbQuery.executeSQLQuery(sql, params);
 }
 
 /**
@@ -134,6 +241,7 @@ function transformToOriginalFormat(doc) {
 
 module.exports = {
     getScores,
+    getScoresWithFilters,
     enrichWithImpactClasses,
     transformToOriginalFormat
 };

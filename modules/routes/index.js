@@ -9,8 +9,8 @@ const agentRaSkgRoutes = require('./ra-skg/agentRoutes');
  * Concat other route files 
  * e.g. admin.concat(user);
  */
-const routes = paper.concat(scholar)
-    .concat(productRaSkgRoutes);
+const routes = productRaSkgRoutes.concat(paper)
+    .concat(scholar);
     // .concat(agentRaSkgRoutes);
 
 // console.log(routes);
