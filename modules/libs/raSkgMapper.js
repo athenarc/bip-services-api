@@ -121,7 +121,7 @@ function getMeasureLabels(indicatorName) {
  */
 function getDefinedIn(indicatorName) {
     const definedIn = {
-        'citation_count': "http://www.wikidata.org/",
+        'citation_count': "https://bip.imsi.athenarc.gr",
         'popularity': "https://bip.imsi.athenarc.gr",
         'influence': "https://bip.imsi.athenarc.gr", 
         'impulse': "https://bip.imsi.athenarc.gr"
@@ -176,7 +176,7 @@ function getCategoryDescription(indicatorName) {
 function mapDocumentToRaSkg(doc, entityType, filters = {}) {
     if (entityType === 'product') {
         return {
-            "local_identifier": `https://explore.openaire.eu/search/result?id=${doc.openaire_id.substring(doc.openaire_id.indexOf('|') + 1)}`,
+            "local_identifier": `https://bip.imsi.athenarc.gr/details/${doc.internal_id}`,
             "entity_type": "product",
             "product_type": doc.product_type,
             "identifiers": 

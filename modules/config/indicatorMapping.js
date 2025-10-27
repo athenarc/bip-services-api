@@ -13,19 +13,19 @@ const INDICATOR_MAPPING = {
     },
     'popularity': {
         type: 'measure', 
-        class: 'https://bip.imsi.athenarc.gr/site/indicators#Popularity',
+        class: 'https://bip.athenarc.gr/ontology/popularity',
         field: 'popularity',
         dbColumn: 'p.attrank'
     },
     'influence': {
         type: 'measure',
-        class: 'https://bip.imsi.athenarc.gr/site/indicators#Influence', 
+        class: 'https://bip.athenarc.gr/ontology/influence', 
         field: 'influence',
         dbColumn: 'p.pagerank'
     },
     'impulse': {
         type: 'measure',
-        class: 'https://bip.imsi.athenarc.gr/site/indicators#Impulse',
+        class: 'https://bip.athenarc.gr/ontology/impulse',
         field: 'impulse',
         dbColumn: 'p.3y_cc'
     },

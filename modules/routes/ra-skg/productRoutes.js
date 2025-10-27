@@ -54,24 +54,10 @@ module.exports = [
                     
                     // Value filtering
                     'cf.min.ra_metrics.ra_metric.ra_value': Joi.number().min(0).description("Minimum threshold for metric value"),
-                    'cf.max.ra_metrics.ra_metric.ra_value': Joi.number().min(0).description("Maximum threshold for metric value"),
 
                     // Pagination
                     page: Joi.number().min(1).default(1).description("Page number - default is 1"),
                     page_size: Joi.number().min(1).max(100).default(10).description("Page size (max 100) - default is 10"),
-                }).custom((value, helpers) => {
-                    // Custom validation: require ra_metrics.ra_metric.ra_measure.class when min/max values are provided
-                    const hasMinValue = value['cf.min.ra_metrics.ra_metric.ra_value'] !== undefined;
-                    const hasMaxValue = value['cf.max.ra_metrics.ra_metric.ra_value'] !== undefined;
-                    const hasMeasureClass = value['ra_metrics.ra_metric.ra_measure.class'] !== undefined;
-                    
-                    if ((hasMinValue || hasMaxValue) && !hasMeasureClass) {
-                        return helpers.error('custom.valueFilterRequiresMeasureClass');
-                    }
-                    
-                    return value;
-                }).messages({
-                    'custom.valueFilterRequiresMeasureClass': 'ra_metrics.ra_metric.ra_measure.class is required when using cf.min.ra_metrics.ra_metric.ra_value or cf.max.ra_metrics.ra_metric.ra_value'
                 })
             }
         },

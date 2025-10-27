@@ -8,19 +8,14 @@ const paperModel = require('../../models/paperModel');
 // Define the controller functions without logging
 const controller = {
     getProduct: async function(local_identifier) {
-        // Extract id parameter from the local_identifier URL
+        // Extract id from the local_identifier URL
+        // local_identifier is in the form: https://bip.imsi.athenarc.gr/details/25061987
         const url = new URL(local_identifier.trim());
-        let id = url.searchParams.get('id');
-
-        if (!id) {
-            id = local_identifier.trim();
-        }
-
-        // patch openaire_id to be compliant with the db values
-        // TODO: remove this once the db values are updated
-        id = `50|${id}`;
         
-        let docs = await paperModel.getScores(id, 'openaire_id');
+        // Extract the ID from the pathname (last segment after '/')
+        const id = url.pathname.split('/').filter(part => part).pop();
+        
+        let docs = await paperModel.getScores(id, 'local_identifier');
         if(!docs.length){
             throw Boom.notFound();
         }
@@ -47,7 +42,6 @@ const controller = {
 
         return {
             meta: {
-                count: docs.length,
                 page: filters.page,
                 page_size: filters.page_size
             },

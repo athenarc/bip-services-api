@@ -20,9 +20,9 @@ async function getScores(identifiers, identifierType = 'doi') {
             FROM pmc_paper
         INNER JOIN pmc_paper_pids ON pmc_paper.internal_id = pmc_paper_pids.paper_id
         WHERE doi IN ( ? )`;
-    } else if (identifierType === 'openaire_id') {
+    } else if (identifierType === 'local_identifier') {
         sql = `SELECT
-            p.openaire_id,
+            p.internal_id,
             CASE 
                 WHEN p.type = 0 THEN 'literature'
                 WHEN p.type = 1 THEN 'research data'
@@ -36,20 +36,83 @@ async function getScores(identifiers, identifierType = 'doi') {
             p.citation_count as citation_count,
             GROUP_CONCAT(
                 CASE 
-                    WHEN pid.doi IS NOT NULL THEN CONCAT('{"value":"', pid.doi, '","scheme":"doi"}')
+                    WHEN pid.doi IS NOT NULL THEN CONCAT('{"value":"', pid.doi, '","scheme": "', pid.pid_type, '"}')
                     ELSE NULL
                 END
                 SEPARATOR '|||'
             ) as pids
             FROM pmc_paper p
         LEFT JOIN pmc_paper_pids pid ON p.internal_id = pid.paper_id
-        WHERE p.openaire_id IN ( ? )
-        GROUP BY p.internal_id, p.openaire_id, p.type, p.attrank, p.pagerank, p.3y_cc, p.citation_count`;
+        WHERE p.internal_id IN ( ? )
+        GROUP BY p.internal_id`;
     } else {
         throw new Error(`Unsupported identifier type: ${identifierType}. Use 'doi' or 'openaire_id'.`);
     }
     
     return dbQuery.executeSQLQuery(sql, [identifiers]);
+}
+
+/**
+ * Build WHERE clause and parameters based on filters
+ * @param {Object} filters - Filter parameters
+ * @returns {Object} Object with whereClause string and params array
+ */
+function buildWhereClause(filters) {
+
+    const params = [];
+    let whereClause = '';
+    
+    // Product type filter
+    if (filters.product_type) {
+        let typeValue;
+        switch (filters.product_type) {
+            case 'literature': typeValue = 0; break;
+            case 'research data': typeValue = 1; break;
+            case 'research software': typeValue = 2; break;
+            case 'other': typeValue = 3; break;
+        }
+        if (typeValue !== undefined) {
+            whereClause += ` AND p.type = ?`;
+            params.push(typeValue);
+        }
+    }
+    
+    // Identifier filters
+    if (filters['identifiers.id']) {
+        const identifiers = filters['identifiers.id'].split(',').map(id => id.trim()).filter(id => id);
+        if (identifiers.length === 1) {
+            whereClause += ` AND pid.doi = ?`;
+            params.push(identifiers[0]);
+        } else if (identifiers.length > 1) {
+            const placeholders = identifiers.map(() => '?').join(',');
+            whereClause += ` AND pid.doi IN (${placeholders})`;
+            params.push(...identifiers);
+        }
+    }
+    
+    if (filters['identifiers.scheme']) {
+        whereClause += ` AND pid.pid_type = ?`;
+        params.push(filters['identifiers.scheme']);
+    }
+    
+    // Value range filter - filter based on min value threshold
+    if (filters['cf.min.ra_metrics.ra_metric.ra_value']) {
+        const measureClass = filters['ra_metrics.ra_metric.ra_measure.class'];
+        const minValue = filters['cf.min.ra_metrics.ra_metric.ra_value'];
+        
+        if (measureClass) {
+            // Apply min value filter to specific metric based on measure class
+            const metricColumn = getDbColumnForMeasureClass(measureClass);
+            whereClause += ` AND ${metricColumn} >= ?`;
+            params.push(minValue);
+        } else {
+            // Apply min value filter to all metrics (citation_count, popularity, influence, impulse)
+            whereClause += ` AND p.citation_count >= ? AND p.attrank >= ? AND p.pagerank >= ? AND p.3y_cc >= ?`;
+            params.push(minValue, minValue, minValue, minValue);
+        }
+    }
+    
+    return { whereClause, params };
 }
 
 /**
@@ -59,10 +122,13 @@ async function getScores(identifiers, identifierType = 'doi') {
  */
 async function getScoresWithFilters(filters) {
 
-    console.log(filters);
     
+    // Build WHERE clause
+    const { whereClause, params } = buildWhereClause(filters);
+    
+    // Build SQL query
     let sql = `SELECT
-        p.openaire_id,
+        p.internal_id,
         CASE 
             WHEN p.type = 0 THEN 'literature'
             WHEN p.type = 1 THEN 'research data'
@@ -76,84 +142,20 @@ async function getScoresWithFilters(filters) {
         p.citation_count as citation_count,
         GROUP_CONCAT(
             CASE 
-                WHEN pid.doi IS NOT NULL THEN CONCAT('{"value":"', pid.doi, '","scheme":"doi"}')
+                WHEN pid.doi IS NOT NULL THEN CONCAT('{"value":"', pid.doi, '","scheme": "', pid.pid_type, '"}')
                 ELSE NULL
             END
             SEPARATOR '|||'
         ) as pids
         FROM pmc_paper p
     LEFT JOIN pmc_paper_pids pid ON p.internal_id = pid.paper_id
-    WHERE 1=1`;
-    
-    const params = [];
-    
-    // TODO: create an index?
-    // Product type filter
-    if (filters.product_type) {
-        let typeValue;
-        switch (filters.product_type) {
-            case 'literature': typeValue = 0; break;
-            case 'research data': typeValue = 1; break;
-            case 'research software': typeValue = 2; break;
-            case 'other': typeValue = 3; break;
-        }
-        if (typeValue !== undefined) {
-            sql += ` AND p.type = ?`;
-            params.push(typeValue);
-        }
-    }
-    
-    // Identifier filters
-    if (filters['identifiers.id']) {
-        const identifiers = filters['identifiers.id'].split(',').map(id => id.trim()).filter(id => id);
-        if (identifiers.length === 1) {
-            sql += ` AND pid.doi = ?`;
-            params.push(identifiers[0]);
-        } else if (identifiers.length > 1) {
-            const placeholders = identifiers.map(() => '?').join(',');
-            sql += ` AND pid.doi IN (${placeholders})`;
-            params.push(...identifiers);
-        }
-    }
-    
-    if (filters['identifiers.scheme']) {
-        sql += ` AND pid.pid_type = ?`;
-        params.push(filters['identifiers.scheme']);
-    }
-    
-    // Value range filters - filter specific indicator based on measure class
-    if (filters['cf.min.ra_metrics.ra_metric.ra_value'] || filters['cf.max.ra_metrics.ra_metric.ra_value']) {
-        const measureClass = filters['ra_metrics.ra_metric.ra_measure.class'];
-        
-        if (!measureClass) {
-            throw new Error('ra_metrics.ra_metric.ra_measure.class is required when using value filters');
-        }
-        
-        // Get database column for the measure class
-        const metricColumn = getDbColumnForMeasureClass(measureClass);
-        
-        // Apply min value filter
-        if (filters['cf.min.ra_metrics.ra_metric.ra_value']) {
-            sql += ` AND ${metricColumn} >= ?`;
-            params.push(filters['cf.min.ra_metrics.ra_metric.ra_value']);
-        }
-        
-        // Apply max value filter
-        if (filters['cf.max.ra_metrics.ra_metric.ra_value']) {
-            sql += ` AND ${metricColumn} <= ?`;
-            params.push(filters['cf.max.ra_metrics.ra_metric.ra_value']);
-        }
-    }
-        
-    // Group by and pagination
-    sql += ` GROUP BY p.internal_id`;
+    WHERE 1=1 ${whereClause}
+    GROUP BY p.internal_id`;
     
     // Add pagination
     const offset = (filters.page - 1) * filters.page_size;
     sql += ` LIMIT ? OFFSET ?`;
     params.push(filters.page_size, offset);
-
-    console.log(sql, params);
     
     return dbQuery.executeSQLQuery(sql, params);
 }
