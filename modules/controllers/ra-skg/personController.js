@@ -24,18 +24,25 @@ const controller = {
         return mapToRaSkgFormat({...res, ...doc}, 'person', {});
     },
 
-    getPersonWithFilters: async function(id, params = {}) {
-        // This is a placeholder implementation
-        // You would implement the actual logic to fetch publications from your data source
+    getPersonWithFilters: async function(queryParams) {
+        // Process query parameters - Joi already handled all the validation and conversion
+        const filters = {
+            // Pass through all query parameters as-is (they're already validated and converted by Joi)
+            ...queryParams
+        };
+        
+        // Get docs from the database with filters
+        let docs = await scholarModel.getResearchersWithFilters(filters);
+        
+        // Transform to RA-SKG format using the mapper
+        const raSkgData = mapToRaSkgFormat(docs, 'person', filters);
+
         return {
-            id: id,
-            publications: [],
-            message: "RA-SKG person publications endpoint - implementation needed",
-            pagination: {
-                page: params.page || 1,
-                page_size: params.page_size || 20,
-                total: 0
-            }
+            meta: {
+                page: filters.page,
+                page_size: filters.page_size
+            },
+            results: raSkgData,
         };
     }
 };

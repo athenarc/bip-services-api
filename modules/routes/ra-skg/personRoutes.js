@@ -27,32 +27,31 @@ module.exports = [
         path: '/ra-skg/persons',
         config: {
             handler: async function (request, h) {
-                // This route should probably get local_identifier from query params or request body
-                const local_identifier = request.query.local_identifier;
-                
-                if (!local_identifier) {
-                    throw Boom.badRequest('Missing local_identifier parameter');
-                }
-                
-                // Extract id parameter from the local_identifier URL
-                const url = new URL(local_identifier);
-                const id = url.searchParams.get('id');
-                
-                if (!id) {
-                    throw Boom.badRequest('Missing id parameter in local_identifier URL');
-                }
-                
-                return controller.personController.getPersonWithFilters(id, request.query);
+                return personController.getPersonWithFilters(request.query);
             },
-            description: 'Get person publications (ra-skg)',
-            notes: 'Enhanced publications endpoint with pagination',
+            description: 'Get a list of persons with filtering and pagination',
+            notes: 'Get a list of persons with support for filtering by identifiers, ra_metrics. Supports pagination.',
             tags: ['api', 'DB - RA-SKG'],
             auth: false,
             validate: {
-                query: {
-                    page: Joi.number().min(1).default(1).description("Page number"),
-                    page_size: Joi.number().min(1).max(100).default(20).description("Page size"),
-                },
+                query: Joi.object({
+                    
+                    // Identifier filtering
+                    'identifiers.id': Joi.string().description("Filter by identifier value"),
+                    'identifiers.scheme': Joi.string().valid('orcid').description("Filter by identifier scheme"),
+                    
+                    // RA Metrics class filtering
+                    'ra_metrics.ra_metric.ra_measure.class': Joi.string().uri().description("Filter by ra_measure class URI"),
+                    'ra_metrics.ra_metric.ra_category.class': Joi.string().uri().description("Filter by ra_category class URI"),
+
+                    // RA Metrics labels filtering
+                    'ra_metrics.ra_metric.ra_measure.labels': Joi.string().description("Filter by ra_measure labels (partial match)"),
+                    'ra_metrics.ra_metric.ra_category.labels': Joi.string().description("Filter by ra_category labels (partial match)"),
+                    
+                    // Pagination
+                    page: Joi.number().min(1).default(1).description("Page number - default is 1"),
+                    page_size: Joi.number().min(1).max(100).default(10).description("Page size (max 100) - default is 10"),
+                })
             }
         },
     },
