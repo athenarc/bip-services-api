@@ -1,38 +1,30 @@
 const Joi = require('joi');
-const controller = require('../../controllers/index.js');
+const { personController } = require('../../controllers/index.js');
 const stats = require('../../logger/stats.js');
+const Boom = require('@hapi/boom');
 
 module.exports = [
     {
         method: 'GET',
-        path: '/ra-skg/agents/{local_identifier}',
+        path: '/ra-skg/persons/{local_identifier}',
         config: {
-            handler: async function (request, h) {
-                // Extract id parameter from the local_identifier URL
-                const local_identifier = request.params.local_identifier.trim();
-                const url = new URL(local_identifier);
-                const id = url.searchParams.get('id');
-                
-                if (!id) {
-                    throw Boom.badRequest('Missing id parameter in local_identifier URL');
-                }
-                
-                return controller.agentRaSkgController.getAgentScores(id);
+            handler: async function (request, h) {          
+                return personController.getPerson(request.params.local_identifier);
             },
-            description: 'Get agent scores (ra-skg)',
-            notes: 'Enhanced agent endpoint with ra-skg specific metrics',
+            description: 'Get a single person',
+            notes: 'Get a single person (type of agent) - See definition in [SKG-IF Research product](https://skg-if.github.io/interoperability-framework/docs/agent.html)',
             tags: ['api', 'DB - RA-SKG'],
             auth: false,
             validate: {
                 params: {
-                    local_identifier: Joi.string().uri().required().description("Agent local identifier"),
+                    local_identifier: Joi.string().uri().required().description("The local identifier that needs to be fetched"),
                 },
             }
         },
     },
     {
         method: 'GET',
-        path: '/ra-skg/agents',
+        path: '/ra-skg/persons',
         config: {
             handler: async function (request, h) {
                 // This route should probably get local_identifier from query params or request body
@@ -50,16 +42,13 @@ module.exports = [
                     throw Boom.badRequest('Missing id parameter in local_identifier URL');
                 }
                 
-                return controller.agentRaSkgController.getAgentPublications(id, request.query);
+                return controller.personController.getPersonWithFilters(id, request.query);
             },
-            description: 'Get agent publications (ra-skg)',
+            description: 'Get person publications (ra-skg)',
             notes: 'Enhanced publications endpoint with pagination',
             tags: ['api', 'DB - RA-SKG'],
             auth: false,
             validate: {
-                // params: {
-                //     local_identifier: Joi.string().required().description("Agent local identifier"),
-                // },
                 query: {
                     page: Joi.number().min(1).default(1).description("Page number"),
                     page_size: Joi.number().min(1).max(100).default(20).description("Page size"),
@@ -68,3 +57,4 @@ module.exports = [
         },
     },
 ];
+

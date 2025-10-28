@@ -2,6 +2,7 @@ const Boom = require('@hapi/boom');
 const axios = require('axios');
 const { wrapController } = require('../../libs/controllerWrapper');
 const { mapToRaSkgFormat } = require('../../libs/raSkgMapper');
+const { getInternalId } = require('../../libs/utils');
 const api_reference = "ProductController";
 const paperModel = require('../../models/paperModel');
 
@@ -9,11 +10,7 @@ const paperModel = require('../../models/paperModel');
 const controller = {
     getProduct: async function(local_identifier) {
         // Extract id from the local_identifier URL
-        // local_identifier is in the form: https://bip.imsi.athenarc.gr/details/25061987
-        const url = new URL(local_identifier.trim());
-        
-        // Extract the ID from the pathname (last segment after '/')
-        const id = url.pathname.split('/').filter(part => part).pop();
+        const id = getInternalId(local_identifier);
         
         let docs = await paperModel.getScores(id, 'local_identifier');
         if(!docs.length){
