@@ -6,7 +6,7 @@
 /**
  * Logger file startup
  */
-require('./modules/logger/winstonLogger.js');
+const winstonLogger = require('./modules/logger/winstonLogger.js');
 
 const Hapi = require('@hapi/hapi');
 const Inert = require('@hapi/inert');

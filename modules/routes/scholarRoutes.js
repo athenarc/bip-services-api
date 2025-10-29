@@ -2,17 +2,16 @@ const Joi = require('joi');
 const controller = require('../controllers');
 const stats = require('../logger/stats.js');
 
-const scholar = [
+module.exports = [
     {
         method: 'GET',
         path: '/scholar/scores/{orcid}',
         config: {
             handler: async function (request, h) {
-                stats.update('/scholar/scores/');
                 return controller.scholarController.getScholarScores(request.params.orcid.trim());
             },
             description: 'Researcher-level indicators',
-            tags: ['api', 'researcher-level indicators'],
+            tags: ['api', 'Citation-based impact indicators'],
             auth: false,
             validate: {
                 params: {
@@ -21,7 +20,4 @@ const scholar = [
             }
         },
     },
-]
-
-
-module.exports = scholar;
+];

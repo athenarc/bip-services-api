@@ -1,29 +1,14 @@
 const Boom = require('@hapi/boom');
-const axios = require('axios');
-const api_reference = "Scholar_Controller";
-var httpProxy = require('http-proxy');
+const { wrapController } = require('../libs/controllerWrapper');
+const api_reference = "ScholarController";
+const scholarModel = require('../models/scholarModel');
 
-module.exports.getScholarScores = async function(orcid) {
-    winstonLogger.info({
-        api_reference: api_reference,
-        event: "/scholar/scores/{orcid}",
-        orcid: orcid
-    });
-
-    const bipApiBaseUrl = 'https://bip.imis.athena-innovation.gr';
-
-    try {
-        let res = await axios.get(`${bipApiBaseUrl}/api/profile`, {
-            params: { orcid },
-            httpsAgent: new (require('https').Agent)({ rejectUnauthorized: false })
-        });
-        return res.data;
-    } catch (err) {
-        if (err.response?.status == 404) {
-            throw Boom.notFound();
-        } else {
-            winstonLogger.error(`Unknown Error for the api ${api_reference}: ${err.message || err}`)
-            throw Boom.expectationFailed("Expected this to work :(");
-        }
+// Define the controller functions without logging
+const controller = {
+    getScholarScores: async function(orcid) {
+        return await scholarModel.getScholarScores(orcid);
     }
-}
+};
+
+// Export the controller with automatic logging and stats tracking
+module.exports = wrapController(api_reference, controller);

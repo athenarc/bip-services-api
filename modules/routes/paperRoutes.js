@@ -3,17 +3,16 @@ const controller = require('../controllers');
 const Lib = require('../libs/commFunctions');
 const stats = require('../logger/stats.js');
 
-const paper = [
+module.exports = [
     {
         method: 'GET',
         path: '/paper/scores/{doi}',
         config: {
             handler: async function (request, h) {
-                stats.update('/paper/scores/')
                 return controller.paperController.getPaperScores(request.params.doi.trim());
             },
             description: 'Citation-based impact indicators for a single article',
-            tags: ['api', 'impact indicators'],
+            tags: ['api', 'Citation-based impact indicators'],
             auth: false,
             validate: {
                 params: {
@@ -27,14 +26,13 @@ const paper = [
         path: '/paper/scores/batch/{dois}',
         config: {
             handler: async function (request, h) {
-                stats.update('/paper/scores/batch/')
                 return controller.paperController.getPaperScoresBatch(
                     request.params.dois.trim().split(',').map(doi => doi.trim()).slice(0,50)
                 );
             },
             description: 'Citation-based impact indicators for multiple articles',
             notes: 'Maximum of 50 DOIs per request',
-            tags: ['api', 'impact indicators'],
+            tags: ['api', 'Citation-based impact indicators'],
             auth: false,
             validate: {
                 params: {
@@ -48,12 +46,11 @@ const paper = [
         path: '/paper/search',
         config: {
             handler: async function (request, h) {
-                stats.update('/paper/search')
                 return controller.paperController.searchPapers(request.query);
             },
             description: 'Search for articles in the BIP! database',
             notes: 'This endpoint requires a valid authentication token',
-            tags: ['api', 'search', 'impact indicators'],
+            tags: ['api', 'Citation-based impact indicators'],
             auth: false,
             validate: {
                 query: {
@@ -73,6 +70,4 @@ const paper = [
             }
         },
     }
-]
-
-module.exports = paper;
+];
