@@ -39,6 +39,7 @@ const config = {
         tags: [
             { name: 'Citation-based impact indicators', description: 'Main category for citation-based impact indicators' },
             { name: 'DB - RA-SKG', description: 'BIP! DB API endpoints compliant with the [RA-SKG extension](https://skg-if.github.io/ext-ra-skg/) of the [SKG Interoperability Framework (SKG-IF)](https://skg-if.github.io/)' },
+            { name: 'NDR - RA-SKG', description: 'BIP! NDR API endpoints compliant with the [RA-SKG extension](https://skg-if.github.io/ext-ra-skg/) of the [SKG Interoperability Framework (SKG-IF)](https://skg-if.github.io/)' },
         ]
     },
     constants: {

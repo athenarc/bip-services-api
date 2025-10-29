@@ -292,29 +292,83 @@ function getCategoryDescription(indicatorName) {
  */
 function mapDocumentToRaSkg(doc, entityType, filters = {}) {
     if (entityType === 'product') {
-        return {
-            "local_identifier": `https://bip.imsi.athenarc.gr/details/${doc.internal_id}`,
+        // Parse identifiers - handle null/empty pids
+        let identifiers = [];
+        if (doc.pids && typeof doc.pids === 'string') {
+            identifiers = doc.pids.split('|||').filter(id => id.trim()).map(id => {
+                try {
+                    return JSON.parse(id);
+                } catch (e) {
+                    return null;
+                }
+            }).filter(id => id !== null);
+        }
+        
+        // Format cites - ensure it's an array if it exists
+        let relatedProducts = undefined;
+        if (doc.cites) {
+            const citesArray = Array.isArray(doc.cites) ? doc.cites : 
+                              (typeof doc.cites === 'string' ? doc.cites.split(',').map(c => c.trim()).filter(c => c) : [doc.cites]);
+            if (citesArray.length > 0) {
+                relatedProducts = {
+                    "cites": citesArray
+                };
+            }
+        }
+        
+        // Build ra_metrics only if doc has metric-related fields
+        let raMetrics = undefined;
+        const hasMetrics = doc.citation_count !== undefined || 
+                          doc.popularity !== undefined || 
+                          doc.influence !== undefined || 
+                          doc.impulse !== undefined;
+        
+        if (hasMetrics) {
+            // Get filtered indicators based on query parameters
+            const measureClass = filters['ra_metrics.ra_metric.ra_measure.class'];
+            const categoryClass = filters['ra_metrics.ra_metric.ra_category.class'];
+            const measureLabels = filters['ra_metrics.ra_metric.ra_measure.labels'];
+            const categoryLabels = filters['ra_metrics.ra_metric.ra_category.labels'];
+            const indicators = getFilteredIndicators(measureClass, categoryClass, measureLabels, categoryLabels);
+            
+            // Build ra_metrics array dynamically
+            const metrics = buildRaMetrics(doc, indicators);
+            // Only include ra_metrics if it's not empty
+            if (metrics && metrics.length > 0) {
+                raMetrics = metrics;
+            }
+        }
+        
+        // Construct local_identifier - use as-is for OTF identifiers, or format as URL for numeric IDs
+        let localIdentifier;
+        if (doc.internal_id && typeof doc.internal_id === 'string' && doc.internal_id.includes('___')) {
+            // OTF identifier format (e.g., otf___1730027051396___person-1 or otf___ndr:dblp___conf/...)
+            localIdentifier = doc.internal_id;
+        } else {
+            // Regular numeric ID - format as URL
+            localIdentifier = `https://bip.imsi.athenarc.gr/details/${doc.internal_id}`;
+        }
+        
+        const result = {
+            "local_identifier": localIdentifier,
             "entity_type": "product",
-            "product_type": doc.product_type,
-            "identifiers": 
-                doc.pids.split('|||').filter(id => id.trim()).map(id => {
-                    return JSON.parse(id);                  
-                }),
-            "related_products": (doc.cites) ? {
-                "cites": doc.cites
-            } : undefined,
-            "ra_metrics": (() => {
-                // Get filtered indicators based on query parameters
-                const measureClass = filters['ra_metrics.ra_metric.ra_measure.class'];
-                const categoryClass = filters['ra_metrics.ra_metric.ra_category.class'];
-                const measureLabels = filters['ra_metrics.ra_metric.ra_measure.labels'];
-                const categoryLabels = filters['ra_metrics.ra_metric.ra_category.labels'];
-                const indicators = getFilteredIndicators(measureClass, categoryClass, measureLabels, categoryLabels);
-                
-                // Build ra_metrics array dynamically
-                return buildRaMetrics(doc, indicators);
-            })()
+            "identifiers": identifiers,
         };
+        
+        // Only add optional fields if they exist
+        if (doc.product_type) {
+            result.product_type = doc.product_type;
+        }
+        
+        if (relatedProducts) {
+            result.related_products = relatedProducts;
+        }
+        
+        if (raMetrics) {
+            result.ra_metrics = raMetrics;
+        }
+        
+        return result;
     } else if (entityType === 'person') {
         // Get filtered indicators based on query parameters
         const measureClass = filters['ra_metrics.ra_metric.ra_measure.class'];
