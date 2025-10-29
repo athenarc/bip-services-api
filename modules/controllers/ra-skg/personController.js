@@ -1,27 +1,30 @@
 const Boom = require('@hapi/boom');
-const axios = require('axios');
 const { wrapController } = require('../../libs/controllerWrapper');
 const { mapToRaSkgFormat } = require('../../libs/raSkgMapper');
+const api_reference = "PersonController";
+const scholarModel = require('../../models/scholarModel');
 const { getInternalId } = require('../../libs/utils');
-const api_reference = "ProductController";
-const paperModel = require('../../models/paperModel');
 
 // Define the controller functions without logging
 const controller = {
-    getProduct: async function(local_identifier) {
+    getPerson: async function(local_identifier) {
         // Extract id from the local_identifier URL
         const id = getInternalId(local_identifier);
-        
-        let docs = await paperModel.getScores(id, 'local_identifier');
-        if(!docs.length){
+
+        let res = await scholarModel.getResearcher(id);
+
+        if (!res || res.length === 0) {
             throw Boom.notFound();
         }
 
-        let doc = await paperModel.enrichWithImpactClasses(docs[0]);
-        return mapToRaSkgFormat(doc, 'product', {});
+        res = res[0];
+
+        let doc = await scholarModel.getScholarScores(res.orcid);
+
+        return mapToRaSkgFormat({...res, ...doc}, 'person', {});
     },
 
-    getProductsWithFilters: async function(queryParams) {
+    getPersonWithFilters: async function(queryParams) {
         // Process query parameters - Joi already handled all the validation and conversion
         const filters = {
             // Pass through all query parameters as-is (they're already validated and converted by Joi)
@@ -29,13 +32,10 @@ const controller = {
         };
         
         // Get docs from the database with filters
-        let docs = await paperModel.getScoresWithFilters(filters);
-
-        // Enrich each document with impact classes
-        docs = await Promise.all(docs.map(doc => paperModel.enrichWithImpactClasses(doc)));
-
+        let docs = await scholarModel.getResearchersWithFilters(filters);
+        
         // Transform to RA-SKG format using the mapper
-        const raSkgData = mapToRaSkgFormat(docs, 'product', filters);
+        const raSkgData = mapToRaSkgFormat(docs, 'person', filters);
 
         return {
             meta: {
@@ -44,8 +44,9 @@ const controller = {
             },
             results: raSkgData,
         };
-    },
+    }
 };
 
 // Export the controller with automatic logging and stats tracking
 module.exports = wrapController(api_reference, controller);
+

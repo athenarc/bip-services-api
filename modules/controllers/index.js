@@ -3,11 +3,13 @@ const scholarController = require('./scholarController');
 
 // RA-SKG Controllers
 const productController = require('./ra-skg/productController');
-const agentController = require('./ra-skg/agentController');
+const personController = require('./ra-skg/personController');
+const ndrController = require('./ra-skg/ndrController');
 
 module.exports = {
     paperController,
     scholarController,
     productController,
-    agentController
+    personController,
+    ndrController
 }

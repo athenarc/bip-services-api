@@ -1,23 +1,21 @@
 const Boom = require('@hapi/boom');
-const axios = require('axios');
 const { wrapController } = require('../../libs/controllerWrapper');
 const { mapToRaSkgFormat } = require('../../libs/raSkgMapper');
 const { getInternalId } = require('../../libs/utils');
-const api_reference = "ProductController";
-const paperModel = require('../../models/paperModel');
+const api_reference = "NdrController";
+const ndrModel = require('../../models/ndrModel');
 
 // Define the controller functions without logging
 const controller = {
     getProduct: async function(local_identifier) {
-        // Extract id from the local_identifier URL
+        // Extract id from the local_identifier
         const id = getInternalId(local_identifier);
         
-        let docs = await paperModel.getScores(id, 'local_identifier');
-        if(!docs.length){
+        let doc = await ndrModel.getProductById(id);
+        if(!doc){
             throw Boom.notFound();
         }
 
-        let doc = await paperModel.enrichWithImpactClasses(docs[0]);
         return mapToRaSkgFormat(doc, 'product', {});
     },
 
@@ -29,10 +27,7 @@ const controller = {
         };
         
         // Get docs from the database with filters
-        let docs = await paperModel.getScoresWithFilters(filters);
-
-        // Enrich each document with impact classes
-        docs = await Promise.all(docs.map(doc => paperModel.enrichWithImpactClasses(doc)));
+        let docs = await ndrModel.getProductsWithFilters(filters);
 
         // Transform to RA-SKG format using the mapper
         const raSkgData = mapToRaSkgFormat(docs, 'product', filters);
@@ -49,3 +44,4 @@ const controller = {
 
 // Export the controller with automatic logging and stats tracking
 module.exports = wrapController(api_reference, controller);
+
