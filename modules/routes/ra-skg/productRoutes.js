@@ -31,14 +31,11 @@ module.exports = [
                 return productController.getProductsWithFilters(request.query);
             },
             description: 'Get a list of products with filtering and pagination',
-            notes: 'Get a list of products with support for filtering by product_type, identifiers, ra_metrics, and value thresholds. Supports pagination.',
+            notes: 'Get a list of products with support for filtering by identifiers, ra_metrics, and value thresholds. Supports pagination.',
             tags: ['api', 'DB - RA-SKG'],
             auth: false,
             validate: {
                 query: Joi.object({
-                    
-                    // Product filtering
-                    product_type: Joi.string().valid('literature', 'research data', 'research software', 'other').description("Filter by product type"),
                     
                     // Identifier filtering
                     'identifiers.id': Joi.string().description("Filter by identifier value"),

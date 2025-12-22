@@ -62,21 +62,6 @@ function buildWhereClause(filters) {
     const params = [];
     let whereClause = '';
     
-    // Product type filter
-    if (filters.product_type) {
-        let typeValue;
-        switch (filters.product_type) {
-            case 'literature': typeValue = 0; break;
-            case 'research data': typeValue = 1; break;
-            case 'research software': typeValue = 2; break;
-            case 'other': typeValue = 3; break;
-        }
-        if (typeValue !== undefined) {
-            whereClause += ` AND p.type = ?`;
-            params.push(typeValue);
-        }
-    }
-    
     // Identifier filters
     if (filters['identifiers.id']) {
         const identifiers = filters['identifiers.id'].split(',').map(id => id.trim()).filter(id => id);
