@@ -54,7 +54,7 @@ module.exports = [
 
                     // Pagination
                     page: Joi.number().min(1).default(1).description("Page number - default is 1"),
-                    page_size: Joi.number().min(1).max(100).default(10).description("Page size (max 100) - default is 10"),
+                    page_size: Joi.number().min(1).max(20).default(10).description("Page size (max 20) - default is 10"),
                 })
             }
         },
