@@ -329,7 +329,17 @@ function mapDocumentToRaSkg(doc, entityType, filters = {}) {
             const categoryClass = filters['ra_metrics.ra_metric.ra_category.class'];
             const measureLabels = filters['ra_metrics.ra_metric.ra_measure.labels'];
             const categoryLabels = filters['ra_metrics.ra_metric.ra_category.labels'];
-            const indicators = getFilteredIndicators(measureClass, categoryClass, measureLabels, categoryLabels);
+            
+            let indicators;
+            if (measureClass || categoryClass || measureLabels || categoryLabels) {
+                indicators = getFilteredIndicators(measureClass, categoryClass, measureLabels, categoryLabels);
+                // Filter to only product indicators (exclude person-specific aggregated metrics)
+                const productIndicators = getIndicatorsByEntityType('product');
+                indicators = indicators.filter(ind => productIndicators.includes(ind));
+            } else {
+                // No filters, use all product indicators directly
+                indicators = getIndicatorsByEntityType('product');
+            }
             
             // Build ra_metrics array dynamically
             const metrics = buildRaMetrics(doc, indicators);
