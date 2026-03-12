@@ -55,7 +55,6 @@ module.exports = [
             validate: {
                 query: {
                     keywords: Joi.string().required().description("Keywords to search"),
-                    rcsb_id: Joi.string().description("RCSB Identifier"),
                     ordering: Joi.string().valid('popularity', 'influence', 'citation_count', 'impulse', 'year').default('popularity').description("Sorting field"),
                     start_year: Joi.number().description("Filter papers published after this year"),
                     end_year: Joi.number().description("Filter papers published before this year"),
