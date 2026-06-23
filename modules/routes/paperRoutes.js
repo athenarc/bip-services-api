@@ -55,13 +55,14 @@ module.exports = [
             validate: {
                 query: {
                     keywords: Joi.string().required().description("Keywords to search"),
-                    ordering: Joi.string().valid('popularity', 'influence', 'citation_count', 'impulse', 'year').default('popularity').description("Sorting field"),
+                    type: Joi.string().valid('publication', 'dataset', 'software', 'other').description("Filter papers based on their type"),                    
                     start_year: Joi.number().description("Filter papers published after this year"),
                     end_year: Joi.number().description("Filter papers published before this year"),
                     popularity: Joi.string().valid('all', 'top001', 'top01', 'top1', 'top10').description("Filter papers based on their popularity class"),
                     influence: Joi.string().valid('all', 'top001', 'top01', 'top1', 'top10').description("Filter papers based on their influence class"),
                     cc: Joi.string().valid('all', 'top001', 'top01', 'top1', 'top10').description("Filter papers based on their citation count class"),                    
                     impulse: Joi.string().valid('all', 'top001', 'top01', 'top1', 'top10').description("Filter papers based on their impulse class"),
+                    ordering: Joi.string().valid('popularity', 'influence', 'citation_count', 'impulse', 'year').default('popularity').description("Sorting field"),
                     page: Joi.number().min(1).default(1).description("Page number"),
                     page_size: Joi.number().min(1).default(20).description("Page size of the requested page"),
                     auth_token: Joi.string().required().description("Authntication token"),
