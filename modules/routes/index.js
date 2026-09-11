@@ -1,5 +1,6 @@
 const paper = require('./paperRoutes');
 const scholar = require('./scholarRoutes');
+const health = require('./healthRoutes');
 
 // RA-SKG Routes
 const productRaSkgRoutes = require('./ra-skg/productRoutes');
@@ -14,7 +15,8 @@ const routes = productRaSkgRoutes
     .concat(personRaSkgRoutes)
     .concat(ndrRoutes)
     .concat(paper)
-    .concat(scholar);
+    .concat(scholar)
+    .concat(health);
 
 // console.log(routes);
 
